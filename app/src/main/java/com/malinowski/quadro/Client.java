@@ -20,13 +20,13 @@ import androidx.annotation.RequiresApi;
 
 class Client extends Thread {
 
-    static int[] ip = {192,168,0,101};//IP для подключения
-    static int port = 8080;//порт для подключения
+    static int[] ip = {192,168,1,186};//IP для подключения
+    static int port = 8888;//порт для подключения
 
     private String message = null;
     private  Socket server;
     private OutputStream out;
-    boolean isConnected = false;
+    static boolean isConnected = false;
     @RequiresApi
     public void run() {
         try
@@ -49,7 +49,7 @@ class Client extends Thread {
             byte[] buffer;
             byte[] result;
             //прием данных происходит в байтах
-            while(server.isConnected()) {
+            while(server.isConnected() && isConnected && MainActivity.client == this) {
                 baos.reset();
                 //при приеме картинки первым остсылается ее размер, чтобы знать какого объема последующий пакет
                 byte[] sizeAr = new byte[4];
@@ -78,6 +78,12 @@ class Client extends Thread {
         }
         catch(Throwable cause){
             Log.e("Error","Error in Client Thread! : " + cause.getMessage());
+        }
+        try {
+            if(server != null && server.isConnected())
+                server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         MainActivity.point.setImageResource(R.drawable.red_point);
         isConnected = false;

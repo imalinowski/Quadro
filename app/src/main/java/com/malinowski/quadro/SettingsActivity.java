@@ -1,5 +1,6 @@
 package com.malinowski.quadro;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,6 +26,7 @@ public class SettingsActivity extends AppCompatActivity  implements PopupMenu.On
     Switch aSwitch;
     SeekBar seekBar;
     EditText ip1,ip2,ip3,ip4,port;
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,104 +66,19 @@ public class SettingsActivity extends AppCompatActivity  implements PopupMenu.On
         });
 
         ip1 = findViewById(R.id.ip1);
-        ip1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-               if(!editable.toString().equals(""))
-                   Client.ip[0] = Integer.parseInt(editable.toString());
-            }
-        });
         ip1.setText(""+Client.ip[0]);
 
 
         ip2 = findViewById(R.id.ip2);
-        ip2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(!editable.toString().equals(""))
-                    Client.ip[1] = Integer.parseInt(editable.toString());
-            }
-        });
         ip2.setText(""+Client.ip[1]);
 
         ip3 = findViewById(R.id.ip3);
-        ip3.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(!editable.toString().equals(""))
-                    Client.ip[2] = Integer.parseInt(editable.toString());
-            }
-        });
         ip3.setText(""+Client.ip[2]);
 
         ip4 = findViewById(R.id.ip4);
-        ip4.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(!editable.toString().equals(""))
-                    Client.ip[3] = Integer.parseInt(editable.toString());
-            }
-        });
         ip4.setText(""+Client.ip[3]);
 
         port = findViewById(R.id.port);
-        port.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(!editable.toString().equals(""))
-                    Client.port = Integer.parseInt(editable.toString());
-            }
-        });
         port.setText(""+Client.port);
     }
 
@@ -171,6 +88,7 @@ public class SettingsActivity extends AppCompatActivity  implements PopupMenu.On
         popup.inflate(R.menu.popup);
         popup.show();
     }
+    @SuppressLint("SetTextI18n")
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
@@ -191,5 +109,20 @@ public class SettingsActivity extends AppCompatActivity  implements PopupMenu.On
         }
         menu.setText(""+MainActivity.mode);
         return true;
+    }
+    @Override
+    protected void onDestroy () {
+        super.onDestroy();
+        if(!ip1.getText().toString().equals(""))
+            Client.ip[0] = Integer.parseInt(ip1.getText().toString());
+        if(!ip2.getText().toString().equals(""))
+            Client.ip[1] = Integer.parseInt(ip2.getText().toString());
+        if(!ip3.getText().toString().equals(""))
+            Client.ip[2] = Integer.parseInt(ip3.getText().toString());
+        if(!ip4.getText().toString().equals(""))
+            Client.ip[3] = Integer.parseInt(ip4.getText().toString());
+        if(!port.getText().toString().equals(""))
+            Client.port = Integer.parseInt(port.getText().toString());
+        MainActivity.client.isConnected = false;
     }
 }

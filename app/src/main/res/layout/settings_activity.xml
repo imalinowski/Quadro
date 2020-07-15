@@ -95,6 +95,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:imeOptions="flagNoExtractUi"
             android:id="@+id/ip1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -115,6 +116,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:imeOptions="flagNoExtractUi"
             android:id="@+id/ip2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -135,6 +137,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:imeOptions="flagNoExtractUi"
             android:id="@+id/ip3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -155,6 +158,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:imeOptions="flagNoExtractUi"
             android:id="@+id/ip4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -182,6 +186,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:imeOptions="flagNoExtractUi"
             android:id="@+id/port"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
