@@ -113,16 +113,33 @@ public class SettingsActivity extends AppCompatActivity  implements PopupMenu.On
     @Override
     protected void onDestroy () {
         super.onDestroy();
-        if(!ip1.getText().toString().equals(""))
-            Client.ip[0] = Integer.parseInt(ip1.getText().toString());
-        if(!ip2.getText().toString().equals(""))
-            Client.ip[1] = Integer.parseInt(ip2.getText().toString());
-        if(!ip3.getText().toString().equals(""))
-            Client.ip[2] = Integer.parseInt(ip3.getText().toString());
-        if(!ip4.getText().toString().equals(""))
-            Client.ip[3] = Integer.parseInt(ip4.getText().toString());
-        if(!port.getText().toString().equals(""))
-            Client.port = Integer.parseInt(port.getText().toString());
-        MainActivity.client.isConnected = false;
+        boolean change = false;
+        if(!ip1.getText().toString().equals("")) {
+            int ip_1 = Integer.parseInt(ip1.getText().toString());
+            change = change | (ip_1!=Client.ip[0]);
+            Client.ip[0] = ip_1;
+        }
+        if(!ip2.getText().toString().equals("")) {
+            int ip_2 = Integer.parseInt(ip2.getText().toString());
+            change = change | (ip_2!=Client.ip[1]);
+            Client.ip[1] = ip_2;
+        }
+        if(!ip3.getText().toString().equals("")) {
+            int ip_3 = Integer.parseInt(ip3.getText().toString());
+            change = change | (ip_3!=Client.ip[2]);
+            Client.ip[2] = ip_3;
+        }
+        if(!ip4.getText().toString().equals("")) {
+            int ip_4 = Integer.parseInt(ip4.getText().toString());
+            change = change | (ip_4!=Client.ip[3]);
+            Client.ip[3] = ip_4;
+        }
+        if(!port.getText().toString().equals("")) {
+            int port_ = Integer.parseInt(port.getText().toString());
+            change = change | (port_!=Client.port);
+            Client.port = port_;
+        }
+        if(change)
+            MainActivity.client.isConnected = false;
     }
 }

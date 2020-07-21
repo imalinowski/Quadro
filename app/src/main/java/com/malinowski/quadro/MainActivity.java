@@ -2,7 +2,6 @@ package com.malinowski.quadro;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,8 +14,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     static Button startStop;
     static ImageView image;
 
-    static Client client;
+    static Client client; //клиент - класс, отвечающий за соединение в отдельном потоке выполняется подключение
     JoyStick joyStickR;
     JoyStick joyStickL;
     int screenWidth;
@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     int pitch = 127;
     int roll = 127;
     static int mode = 2;
+
+    private int timerSec = 0;//миллисекунды таймера
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,12 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 R.drawable.no_video);
         image.setImageBitmap(bitmap);
 
-        //joyStickR = new JoyStick(screenWidth*3/4,screenHeight/2,this,0);
-        //joyStickL = new JoyStick(screenWidth*1/4,screenHeight/2,this,1);
-
-        //клиент - класс, отвечающий за соединение в отдельном потоке выполняется подключение
-        client = new Client();
-        client.start();
         MyTimer timer = new MyTimer();
         timer.start();
     }
@@ -79,14 +75,14 @@ public class MainActivity extends AppCompatActivity {
     void onDirectionChanged_left(double degrees, double distance){
         throttle = (int)Math.floor(127-127*distance*Math.cos(degrees*Math.PI/180));
         yaw = (int)Math.floor(127+127*distance*Math.sin(degrees* Math.PI/180));
-        if(client.isConnected)
+        if(client!= null && client.isConnected)
             client.send(yaw,throttle,pitch,roll,mode);
     }
     void onDirectionChanged_right(double degrees, double distance){
         pitch  = (int)Math.floor(127-127*distance*Math.cos(degrees*Math.PI/180));
         roll  = (int)Math.floor(127+127*distance*Math.sin(degrees* Math.PI/180));
 
-        if(client.isConnected)
+        if(client!= null && client.isConnected)
             client.send(yaw,throttle,pitch,roll,mode);
     }
 
@@ -102,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             switch (e.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_POINTER_DOWN:
-                    if (e.getX(pointerID) > screenWidth / 2) {
+                    if (e.getX(pointerID) > screenWidth / 2.0f) {
                         if (joyStickR != null) joyStickR.delete();
                         joyStickR = new JoyStick(e.getX(pointerID), e.getY(pointerID),this, pointerID);
                     } else {
@@ -149,8 +145,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
         //проверка, что эвент пришел от джойстика
-        if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
-                && event.getAction() == MotionEvent.ACTION_MOVE) {
+        //Log.i("Joystick",""+event.getSource()+" "+InputDevice.SOURCE_MOUSE;
+        if ((event.getSource() & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE
+                && event.getAction() == MotionEvent.ACTION_HOVER_MOVE && useJoyStick ) {
             processJoystickInput(event,-1);
             return true;
         }
@@ -214,15 +211,24 @@ public class MainActivity extends AppCompatActivity {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void update(){
-        //спустя какое-то время после неудачной попытки соединения вновь пытаемся подключиться
-        if(!client.isAlive()){
-            client = new Client();
-            client.start();
+
+        if(client!=null && !client.isConnected && client.isAlive() && timerSec%1000==0){
+            info.setText(info.getText()+".");
         }
     }
 
     public void onSettings(View view) {
         startActivity (new Intent(this, SettingsActivity.class));
+    }
+
+    public void onConnect(View view) throws IOException {
+        if(client==null || !client.isAlive()) {
+            client = new Client();
+            client.start();
+        }
+        if(client.isConnected)
+            client.stopConnection();
+
     }
 
     //таймер для повторных подключений
@@ -232,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
         }
         @Override
         public void onTick(long millisUntilFinished) {
+            timerSec = (timerSec+100)%1000;
             update();
         }
         @Override
